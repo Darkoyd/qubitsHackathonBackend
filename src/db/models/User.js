@@ -7,7 +7,8 @@ class User extends Sequelize.Model {
 		return super.init({
 			id: {
 				type: Sequelize.UUID,
-				priamryKey: true,
+				allowNull: false,
+				primaryKey: true,
 				defaultValue: Sequelize.UUID
 			},
 			email: {

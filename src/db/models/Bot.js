@@ -6,7 +6,9 @@ class Bot extends Sequelize.Model {
 		return super.init({
 			id: {
 				type: Sequelize.UUID,
-				allowNull: false
+				allowNull: false,
+				primaryKey: true,
+				defaultValue: Sequelize.UUID
 			},
 			name: {
 				type: Sequelize.STRING,
@@ -35,3 +37,5 @@ class Bot extends Sequelize.Model {
 		})
 	}
 }
+
+module.exports = Bot
