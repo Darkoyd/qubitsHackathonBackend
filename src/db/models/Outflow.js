@@ -10,13 +10,13 @@ class Outflow extends Sequelize.Model {
 				primaryKey: true,
 				defaultValue: Sequelize.UUID
 			},
-			text: {
-				type: Sequelize.STRING,
+			message: {
+				type: Sequelize.JSONB,
 				allowNull: false,
 				validate: {
 					notEmpty: {
 						args: true,
-						msg: errors.empty('name')
+						msg: errors.empty('message')
 					}
 				}
 			}
