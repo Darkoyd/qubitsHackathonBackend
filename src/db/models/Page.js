@@ -49,6 +49,7 @@ class Page extends Sequelize.Model {
 			sequelize,
 			paranoid: true,
 			hooks: {
+				// eslint-disable-next-line no-unused-vars
 				async beforeSave (page, options) {
 					if (page.changed('pageId')) {
 						const salt = await bcrypt.genSalt(10)

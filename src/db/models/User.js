@@ -46,6 +46,7 @@ class User extends Sequelize.Model {
 			sequelize,
 			paranoid: true,
 			hooks: {
+				// eslint-disable-next-line no-unused-vars
 				async beforeSave (user, options) {
 					if (user.changed('password')) {
 						const salt = await bcrypt.genSalt(10)
