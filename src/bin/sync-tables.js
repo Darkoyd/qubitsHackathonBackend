@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 const db = require('../db')
-require('dotenv').config({path: '../../../.env'})
+// eslint-disable-next-line no-undef
+require('dotenv').config({path: `${process.cwd()}/.env`})
 
 /**
  * Sync database and exit
