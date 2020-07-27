@@ -37,11 +37,13 @@ class Outflow extends Sequelize.Model {
 		})
 		this.belongsTo(models.Inflow,  {
 			foreignKey: {
-				name: 'PreviousInflowId'
+				name: 'PreviousInflowId',
+				constraints: false,
+				allowNull: true,
+				defaultValue: null
 			},
 			as: 'Previous'
 		})
-		this.hasOne(models.Inflow)
 	}
 }
 

@@ -4,7 +4,8 @@
   "description": "Qubits hackathon's backend",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/bin/run.js --max-old-space-size=4096"
+    "dev": "nodemon src/bin/run.js --max-old-space-size=4096",
+    "sync-tables": "node src/bin/sync-tables.js"
   },
   "repository": {
     "type": "git",

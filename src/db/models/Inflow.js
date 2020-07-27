@@ -35,12 +35,6 @@ class Inflow extends Sequelize.Model {
 			onDelete: 'restrict',
 			as: 'Bot'
 		})
-		this.belongsTo(models.Outflow,  {
-			foreignKey: {
-				name: 'PreviousOutflowId'
-			},
-			as: 'Previous'
-		})
 		this.hasOne(models.Outflow)
 	}
 }

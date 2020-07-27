@@ -8,8 +8,10 @@ require('dotenv').config({path: '../../../.env'})
  */
 db.sequelize.sync().then(() => {
 	console.log('Reset tables successfully')
+	// eslint-disable-next-line no-undef
 	process.exit(0)
 }).catch(e => {
 	console.error(e)
+	// eslint-disable-next-line no-undef
 	process.exit(1)
 })
