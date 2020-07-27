@@ -70,7 +70,7 @@ class User extends Sequelize.Model {
 
 		this.hasMany(models.Page,{
 			foreignKey: {
-				allowNull: false
+				allowNull: true
 			}
 		})
 	}

@@ -2,6 +2,7 @@ const debug = require('debug')('backend:routes:auth')
 const express = require('express')
 
 const router = express.Router()
+// eslint-disable-next-line no-undef
 const { User, UserAuthToken } = require(`${process.cwd()}/src/db`)
 const wrapper = require('express-debug-async-wrap')(debug)
 

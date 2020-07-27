@@ -87,7 +87,7 @@ class Page extends Sequelize.Model {
 		})
 		this.hasMany(models.Bot, {
 			foreignKey: {
-				allowNull: false
+				allowNull: true
 			}
 		})
 	}
