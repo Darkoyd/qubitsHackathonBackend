@@ -32,7 +32,9 @@ router.get('/:BotId', wrapper( async (req, res) =>{
 	if (bot === 0) {
 		res.sendStatus(404)
 	}
-	res.send(bot)
+	else{
+		res.send(bot)
+	}
 }))
 
 router.put('/:BotId',  wrapper( async (req, res) =>{
