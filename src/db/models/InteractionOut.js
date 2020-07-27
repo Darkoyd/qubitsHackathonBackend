@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const errors = require('../../utils/validationErrors')
 
-class Inflow extends Sequelize.Model {
+class InteractionOut extends Sequelize.Model {
 	static init(sequelize) {
 		return super.init({
 			id: {
@@ -10,15 +10,19 @@ class Inflow extends Sequelize.Model {
 				primaryKey: true,
 				defaultValue: Sequelize.UUID
 			},
-			message: {
-				type: Sequelize.JSONB,
+			facebookName: {
+				type: Sequelize.STRING,
 				allowNull: false,
 				validate: {
 					notEmpty: {
 						args: true,
-						msg: errors.empty('message')
+						msg: errors.empty('content')
 					}
 				}
+			},
+			data: {
+				type: Sequelize.JSONB,
+				allowNull: true,
 			}
 		}, {
 			sequelize,
@@ -28,27 +32,14 @@ class Inflow extends Sequelize.Model {
 	}
 
 	static associate (models) {
-		this.belongsTo(models.Bot,  {
+		this.belongsTo(models.MessegeOut,  {
 			foreignKey: {
-				name: 'BotId'
-			},
-			onDelete: 'restrict',
-			as: 'Bot'
-		})
-		this.belongsToMany(models.Outflow, {
-			through: 'PreviousOutflows', 
-			as: 'PreviousOuts'
-		})
-		this.belongsToMany(models.Outflow, {
-			through: 'PreviousInflows'
-		})
-		this.hasOne(models.MessegeIn, {
-			foreignKey: {
+				name: 'MessegeOutId',
 				allowNull: false
 			},
-			onDelete: 'CASCADE'
+			as: 'MessegeOut'
 		})
 	}
 }
 
-module.exports = Inflow
+module.exports = InteractionOut

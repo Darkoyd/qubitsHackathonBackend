@@ -60,7 +60,7 @@ router.put('/Previous/:PreviousId',  wrapper( async (req, res) =>{
 			res.sendStatus(401)
 		}
 		else{
-			outflow.PreviousId = previous.id
+			outflow.addInflow(previous)
 			const updated = outflow.update()
 			res.status(200).send(updated)
 		}
