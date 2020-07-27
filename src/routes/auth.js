@@ -1,4 +1,4 @@
-const debug = require('debug')('backend:routes:auth')
+const debug = require('debug')('backend:routes:authRoutes')
 const express = require('express')
 const {v4: uuidv4} = require('uuid')
 
@@ -13,7 +13,7 @@ router.get('/', wrapper(async(req, res) => {
 	res.send(200)
 }))
 
-router.post('/signin', wrapper(async (req, res) => {
+router.get('/signin', wrapper(async (req, res) => {
 	const user = await findByEmail(req.body.email)
 	const passwordMatch = user.authenticate(req.body.password)
 	if (passwordMatch) {

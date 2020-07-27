@@ -33,6 +33,7 @@ app.use(cors())
 app.use(logger('backend:requests', 'START :method :url', { immediate: true }))
 app.use(logger('backend:requests', 'DONE :method :url :status :res[content-length] - :response-time ms'))
 app.use(express.json())
+app.use(require('./middleware/auth'))
 
 /**
  * Use automatic route loader
