@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const errors = require('../../utils/validationErrors')
 
-class Bot extends Sequelize.Model {
+class Inflow extends Sequelize.Model {
 	static init(sequelize) {
 		return super.init({
 			id: {
@@ -10,13 +10,13 @@ class Bot extends Sequelize.Model {
 				primaryKey: true,
 				defaultValue: Sequelize.UUID
 			},
-			name: {
-				type: Sequelize.STRING,
+			message: {
+				type: Sequelize.JSONB,
 				allowNull: false,
 				validate: {
 					notEmpty: {
 						args: true,
-						msg: errors.empty('name')
+						msg: errors.empty('message')
 					}
 				}
 			}
@@ -28,31 +28,20 @@ class Bot extends Sequelize.Model {
 	}
 
 	static associate (models) {
-		this.belongsTo(models.User,  {
+		this.belongsTo(models.Bot,  {
 			foreignKey: {
-				name: 'UserId'
+				name: 'BotId'
 			},
 			onDelete: 'restrict',
-			as: 'User'
+			as: 'Bot'
 		})
-		this.belongsTo(models.Page,  {
+		this.belongsTo(models.Outflow,  {
 			foreignKey: {
-				name: 'PageId'
+				name: 'PreviousOutflowId'
 			},
-			onDelete: 'restrict',
-			as: 'Page'
-		})
-		this.hasMany(models.Outflow, {
-			foreignKey: {
-				allowNull: true
-			}
-		})
-		this.hasMany(models.Inflow, {
-			foreignKey: {
-				allowNull: true
-			}
+			as: 'Previous'
 		})
 	}
 }
 
-module.exports = Bot
+module.exports = Inflow
