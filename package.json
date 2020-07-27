@@ -4,7 +4,7 @@
   "description": "Qubits hackathon's backend",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/bin/index.js --max-old-space-size=4096"
+    "dev": "nodemon src/bin/run.js --max-old-space-size=4096"
   },
   "repository": {
     "type": "git",
@@ -18,14 +18,17 @@
   "homepage": "https://github.com/Darkoyd/qubitsHackathonBackend#readme",
   "dependencies": {
     "axios": "^0.19.2",
+    "axios-retry": "^3.1.8",
     "bcryptjs": "^2.4.3",
     "blocked-at": "^1.2.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
+    "debug": "^4.1.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-debug-async-wrap": "^2.0.1",
+    "express-route-autoloader": "^1.0.3",
     "morgan": "^1.10.0",
     "morgan-debug": "^2.0.0",
     "nodemon": "^2.0.4",
@@ -33,7 +36,8 @@
     "pg-hstore": "^2.3.3",
     "sequelize": "^6.3.3",
     "sequelize-cli": "^6.2.0",
-    "sequelize-express-findbyid": "^1.0.7"
+    "sequelize-express-findbyid": "^1.0.7",
+    "uuid": "^8.2.0"
   },
   "devDependencies": {
     "eslint": "^7.5.0",
