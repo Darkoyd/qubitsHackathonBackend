@@ -41,6 +41,7 @@ class Outflow extends Sequelize.Model {
 			},
 			as: 'Previous'
 		})
+		this.hasOne(models.Inflow)
 	}
 }
 
