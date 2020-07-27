@@ -45,4 +45,14 @@ router.put('/:BotId',  wrapper( async (req, res) =>{
 	}
 }))
 
-router.delete()
+router.delete('/:BotId',  wrapper( async (req, res) =>{
+	const result = await Bot.destroy({where: {id: req.params.BotId}})
+	if (result === 0) {
+		res.sendStatus(404)
+	}
+	else{
+		res.sendStatus(200)
+	}
+}))
+
+module.exports = router
