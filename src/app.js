@@ -46,10 +46,8 @@ function loadRoutes(app, routerPath = 'src/routes') {
 			loadRoutes(app, filePath)
 		} else {
 			const route = filePath.replace('src\\routes\\', '/').replace('\\','/').replace('.js', '').replace('index', '')
-			console.log(route)
 			const requireFilePath = path.resolve(filePath)
 			app.use(route, require(requireFilePath))
-			console.log(requireFilePath)
 		}
 	})
 }
@@ -68,6 +66,7 @@ app.use((req, res, next) => {
 /**
  * Custom error handler that adds errors and uses custom debug if sent by error thrower
  */
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
 	err.status = err.status || 500
 	const betterDebug = err.debug ? err.debug : debug
