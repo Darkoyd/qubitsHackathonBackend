@@ -11,7 +11,7 @@ router.get('/', wrapper(async(req, res) => {
 	res.sendStatus(200)
 }))
 
-router.get('/signin', wrapper(async (req, res) => {
+router.post('/signin', wrapper(async (req, res) => {
 	const user = await findByEmail(req.body.email)
 	const passwordMatch = user.authenticate(req.body.password)
 	if (passwordMatch) {
