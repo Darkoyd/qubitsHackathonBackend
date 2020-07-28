@@ -8,9 +8,7 @@ const { User, UserAuthToken } = require(`${process.cwd()}/src/db`)
 const wrapper = require('express-debug-async-wrap')(debug)
 
 router.get('/', wrapper(async(req, res) => {
-	console.log(req)
-	console.log(res)
-	res.send(200)
+	res.sendStatus(200)
 }))
 
 router.get('/signin', wrapper(async (req, res) => {
