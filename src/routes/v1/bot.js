@@ -23,12 +23,12 @@ router.post('/:UserId', wrapper( async (req, res) =>{
 }))
 
 router.get('/', wrapper( async (req, res) =>{
-	const bots = await Bot.findAll()
+	const bots = await Bot.findAll({ where: { UserId: req.body.UserId } })
 	res.send(bots)
 }))
 
 router.get('/:BotId', wrapper( async (req, res) =>{
-	const bot = await Bot.findOne({ where: { id: req.params.BotId } })
+	const bot = await Bot.findOne({ where: { id: req.params.BotId, UserId: req.body.UserId } })
 	if (bot === 0) {
 		res.sendStatus(404)
 	}

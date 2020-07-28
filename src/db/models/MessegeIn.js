@@ -1,8 +1,7 @@
 const Sequelize = require('sequelize')
-// eslint-disable-next-line no-unused-vars
 const errors = require('../../utils/validationErrors')
 
-class Outflow extends Sequelize.Model {
+class MessegeIn extends Sequelize.Model {
 	static init(sequelize) {
 		return super.init({
 			id: {
@@ -10,6 +9,16 @@ class Outflow extends Sequelize.Model {
 				allowNull: false,
 				primaryKey: true,
 				defaultValue: Sequelize.UUID
+			},
+			content: {
+				type: Sequelize.JSONB,
+				allowNull: false,
+				validate: {
+					notEmpty: {
+						args: true,
+						msg: errors.empty('content')
+					}
+				}
 			}
 		}, {
 			sequelize,
@@ -19,27 +28,20 @@ class Outflow extends Sequelize.Model {
 	}
 
 	static associate (models) {
-		this.belongsTo(models.Bot,  {
+		this.belongsTo(models.Inflow,  {
 			foreignKey: {
-				name: 'BotId'
-			},
-			onDelete: 'restrict',
-			as: 'Bot'
-		})
-		this.belongsToMany(models.Inflow, {
-			through: 'PreviousOutflows'
-		})
-		this.belongsToMany(models.Inflow, {
-			through: 'PreviousInflows',
-			as: 'PreviousIns'
-		})
-		this.hasOne(models.MessegeOut, {
-			foreignKey: {
+				name: 'InflowId',
 				allowNull: false
+			},
+			as: 'Inflow'
+		})
+		this.hasMany(models.InteractionIn, {
+			foreignKey: {
+				allowNull: true
 			},
 			onDelete: 'CASCADE'
 		})
 	}
 }
 
-module.exports = Outflow
+module.exports = MessegeIn
