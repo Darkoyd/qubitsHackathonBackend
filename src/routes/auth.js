@@ -18,7 +18,8 @@ router.get('/signin', wrapper(async (req, res) => {
 	const passwordMatch = user.authenticate(req.body.password)
 	if (passwordMatch) {
 		const token = await UserAuthToken.create({ UserId: user.id })
-		return res.send({ token: token.token })
+
+		return res.send({ user: user, token: token.token })
 	}
 	const err = new Error('Invalid credentials')
 	err.status = 401
