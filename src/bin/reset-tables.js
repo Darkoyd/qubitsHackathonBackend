@@ -7,7 +7,7 @@ const db = require('../db')
 /**
  * Sync database and exit
  */
-db.sequelize.sync().then(() => {
+db.sequelize.sync({ force: true }).then(() => {
 	console.log('Reset tables successfully')
 	// eslint-disable-next-line no-undef
 	process.exit(0)

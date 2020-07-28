@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/bin/run.js --max-old-space-size=4096",
-    "sync-tables": "node src/bin/sync-tables.js"
+    "sync": "node src/bin/sync-tables.js",
+    "reset": "node src/bin/reset-table.js"
   },
   "repository": {
     "type": "git",
@@ -29,7 +30,6 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-debug-async-wrap": "^2.0.1",
-    "express-route-autoloader": "^1.0.3",
     "morgan": "^1.10.0",
     "morgan-debug": "^2.0.0",
     "nodemon": "^2.0.4",
