@@ -29,7 +29,7 @@ class Page extends Sequelize.Model {
 					msg: errors.url('URL')
 				}
 			},
-			pageId:{
+			facebookPageId:{
 				type: Sequelize.STRING,
 				allowNull: false
 			},

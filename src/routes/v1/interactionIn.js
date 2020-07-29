@@ -1,5 +1,6 @@
 const debug = require('debug')('backend:routes:interactionIn')
 const express = require('express')
+const { v4: uuidv4 } = require('uuid')
 
 const router = express.Router()
 // eslint-disable-next-line no-undef
@@ -14,12 +15,16 @@ router.post('/:MessegeInId', wrapper( async (req, res) =>{
 	}
 	else{
 		//Si falla crear un nuevo Json
-		const interactionInJson = req.body
-		interactionInJson.MessegeIn = messegeInId
+		const interactionInJson = {
+			id: uuidv4(),
+			facebookName: req.body.facebookName,
+			data: req.body.data,
+			MessegeInId: messegeInId
+		}
 		const interactionIn = await InteractionIn.create(interactionInJson)
-		res.send(interactionIn)
+		res.status(200).send(interactionIn)
 	}
-	
+
 }))
 
 router.get('/', wrapper( async (req, res) =>{
