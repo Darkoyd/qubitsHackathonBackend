@@ -26,8 +26,13 @@ router.post('/:UserId', wrapper( async (req, res) =>{
 
 }))
 
-router.get('/', wrapper( async (req, res) =>{
-	const bots = await Bot.findAll({ where: { UserId: req.body.UserId } })
+router.get('/:PageId', wrapper(async (req, res) => {
+	const bots = await Bot.findAll({where: {PageId: req.params.PageId}})
+	res.send(bots)
+}))
+
+router.get('/:UserId', wrapper( async (req, res) =>{
+	const bots = await Bot.findAll({ where: { UserId: req.params.UserId }})
 	res.send(bots)
 }))
 

@@ -31,8 +31,8 @@ router.post('/:UserId', wrapper( async (req, res) =>{
 
 }))
 
-router.get('/', wrapper( async (req, res) =>{
-	const pages = await Page.findAll()
+router.get('/:UserId', wrapper( async (req, res) =>{
+	const pages = await Page.findAll({where: {UserId: req.params.UserId}})
 	res.send(pages)
 }))
 
