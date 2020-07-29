@@ -19,11 +19,11 @@ router.post('/:UserId', wrapper( async (req, res) =>{
 			id: uuidv4(),
 			name: req.body.name,
 			url: req.body.url,
-			userId: userId,
 			facebookPageId: req.body.facebookPageId,
 			appId: req.body.appId,
 			pageAccessToken: req.body.pageAccessToken,
-			appSecret: req.body.appSecret
+			appSecret: req.body.appSecret,
+			UserId: userId,
 		}
 		const page = await Page.create(pageJson)
 		res.send(page)
