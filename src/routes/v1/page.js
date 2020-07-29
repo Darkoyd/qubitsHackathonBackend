@@ -19,6 +19,7 @@ router.post('/:UserId', wrapper( async (req, res) =>{
 			id: uuidv4(),
 			name: req.body.name,
 			url: req.body.url,
+			userId: userId,
 			facebookPageId: req.body.facebookPageId,
 			appId: req.body.appId,
 			pageAccessToken: req.body.pageAccessToken,
@@ -43,7 +44,7 @@ router.get('/:PageId', wrapper( async (req, res) =>{
 	else{
 		res.send(page)
 	}
-	
+
 }))
 
 router.put('/:PageId',  wrapper( async (req, res) =>{
