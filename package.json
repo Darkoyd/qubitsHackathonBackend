@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/bin/run.js --max-old-space-size=4096",
     "sync": "node src/bin/sync-tables.js",
-    "reset": "node src/bin/reset-table.js"
+    "reset": "node src/bin/reset-tables.js"
   },
   "repository": {
     "type": "git",
