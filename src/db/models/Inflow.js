@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize')
+// eslint-disable-next-line no-unused-vars
 const errors = require('../../utils/validationErrors')
 
 class Inflow extends Sequelize.Model {
@@ -9,16 +10,6 @@ class Inflow extends Sequelize.Model {
 				allowNull: false,
 				primaryKey: true,
 				defaultValue: Sequelize.UUID
-			},
-			message: {
-				type: Sequelize.JSONB,
-				allowNull: false,
-				validate: {
-					notEmpty: {
-						args: true,
-						msg: errors.empty('message')
-					}
-				}
 			}
 		}, {
 			sequelize,
