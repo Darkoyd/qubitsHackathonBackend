@@ -51,7 +51,7 @@ router.put('/:InflowId',  wrapper( async (req, res) =>{
 	}
 }))
 
-router.put('/Previous/:PreviousId',  wrapper( async (req, res) =>{
+router.put('/:InflowId/Previous/:PreviousId',  wrapper( async (req, res) =>{
 	const inflow = await Inflow.findOne({where: {id: req.params.InflowId}})
 	if (inflow === 0) {
 		res.sendStatus(404)
