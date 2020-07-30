@@ -1,5 +1,6 @@
 const debug = require('debug')('backend:routes:outflow')
 const express = require('express')
+const {v4: uuidv4} = require('uuid')
 
 const router = express.Router()
 // eslint-disable-next-line no-undef
@@ -14,12 +15,15 @@ router.post('/:BotId', wrapper( async (req, res) =>{
 	}
 	else{
 		//Si falla crear un nuevo Json
-		const outflowJson = req.body
-		outflowJson.Bot = botId
+		const outflowJson = {
+			id: uuidv4(),
+			message: req.body.message,
+			BotId: botId
+		}
 		const outflow = await Outflow.create(outflowJson)
-		res.send(outflow)
+		res.status(200).send(outflow)
 	}
-	
+
 }))
 
 router.get('/', wrapper( async (req, res) =>{
@@ -35,7 +39,7 @@ router.get('/:OutflowId', wrapper( async (req, res) =>{
 	else{
 		res.send(outflow)
 	}
-	
+
 }))
 
 router.put('/:OutflowId',  wrapper( async (req, res) =>{

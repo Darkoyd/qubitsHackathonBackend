@@ -1,5 +1,6 @@
 const debug = require('debug')('backend:routes:page')
 const express = require('express')
+const { v4: uuidv4 } = require('uuid')
 
 const router = express.Router()
 // eslint-disable-next-line no-undef
@@ -14,16 +15,24 @@ router.post('/:UserId', wrapper( async (req, res) =>{
 	}
 	else{
 		//Si falla crear un nuevo Json
-		const pageJson = req.body
-		pageJson.User = userId
+		const pageJson = {
+			id: uuidv4(),
+			name: req.body.name,
+			url: req.body.url,
+			facebookPageId: req.body.facebookPageId,
+			appId: req.body.appId,
+			pageAccessToken: req.body.pageAccessToken,
+			appSecret: req.body.appSecret,
+			UserId: userId,
+		}
 		const page = await Page.create(pageJson)
 		res.send(page)
 	}
-	
+
 }))
 
-router.get('/', wrapper( async (req, res) =>{
-	const pages = await Page.findAll()
+router.get('/:UserId', wrapper( async (req, res) =>{
+	const pages = await Page.findAll({where: {UserId: req.params.UserId}})
 	res.send(pages)
 }))
 
@@ -35,7 +44,7 @@ router.get('/:PageId', wrapper( async (req, res) =>{
 	else{
 		res.send(page)
 	}
-	
+
 }))
 
 router.put('/:PageId',  wrapper( async (req, res) =>{

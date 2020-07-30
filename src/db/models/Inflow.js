@@ -35,7 +35,7 @@ class Inflow extends Sequelize.Model {
 		})
 		this.hasOne(models.MessegeIn, {
 			foreignKey: {
-				allowNull: false
+				allowNull: true
 			},
 			onDelete: 'CASCADE'
 		})

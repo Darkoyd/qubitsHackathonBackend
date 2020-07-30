@@ -1,5 +1,6 @@
 const debug = require('debug')('backend:routes:inflow')
 const express = require('express')
+const {v4: uuidv4} = require('uuid')
 
 const router = express.Router()
 // eslint-disable-next-line no-undef
@@ -14,12 +15,14 @@ router.post('/:BotId', wrapper( async (req, res) =>{
 	}
 	else{
 		//Si falla crear un nuevo Json
-		const inflowJson = req.body
-		inflowJson.Bot = botId
+		const inflowJson = {
+			id: uuidv4(),
+			message: req.body.message,
+			BotId: botId
+		}
 		const inflow = await Inflow.create(inflowJson)
-		res.send(inflow)
+		res.status(200).send(inflow)
 	}
-	
 }))
 
 router.get('/', wrapper( async (req, res) =>{
@@ -32,10 +35,10 @@ router.get('/:InflowId', wrapper( async (req, res) =>{
 	if (inflow === 0) {
 		res.sendStatus(404)
 	}
-	else{
+	else {
 		res.send(inflow)
 	}
-	
+
 }))
 
 router.put('/:InflowId',  wrapper( async (req, res) =>{
@@ -43,7 +46,7 @@ router.put('/:InflowId',  wrapper( async (req, res) =>{
 	if (inflow === 0) {
 		res.sendStatus(404)
 	}
-	else{
+	else {
 		res.send(inflow)
 	}
 }))
@@ -53,18 +56,18 @@ router.put('/Previous/:PreviousId',  wrapper( async (req, res) =>{
 	if (inflow === 0) {
 		res.sendStatus(404)
 	}
-	else{
+	else {
 		const botId = inflow.Bot
 		const previous = await Outflow.findOne({ where: { id: req.params.PreviousId,  Bot: botId}})
 		if (previous === 0) {
 			res.sendStatus(401)
 		}
-		else{
+		else {
 			inflow.addOutflow(previous)
 			const updated = inflow.update()
 			res.status(200).send(updated)
 		}
-		
+
 	}
 }))
 
@@ -73,7 +76,7 @@ router.delete('/:InflowId',  wrapper( async (req, res) =>{
 	if (result === 0) {
 		res.sendStatus(404)
 	}
-	else{
+	else {
 		res.sendStatus(200)
 	}
 }))

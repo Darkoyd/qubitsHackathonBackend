@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/bin/run.js --max-old-space-size=4096",
     "sync": "node src/bin/sync-tables.js",
-    "reset": "node src/bin/reset-table.js"
+    "reset": "node src/bin/reset-tables.js"
   },
   "repository": {
     "type": "git",
@@ -30,6 +30,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-debug-async-wrap": "^2.0.1",
+    "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
     "morgan-debug": "^2.0.0",
     "nodemon": "^2.0.4",

@@ -25,11 +25,13 @@ class Page extends Sequelize.Model {
 				type: Sequelize.STRING,
 				allowNull: false,
 				validate: {
-					args: true,
-					msg: errors.url('URL')
+					notEmpty: {
+						args: true,
+						msg: errors.url('URL')
+					}
 				}
 			},
-			pageId:{
+			facebookPageId:{
 				type: Sequelize.STRING,
 				allowNull: false
 			},

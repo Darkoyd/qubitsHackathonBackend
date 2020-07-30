@@ -1,5 +1,6 @@
 const debug = require('debug')('backend:routes:bot')
 const express = require('express')
+const {v4: uuidv4} = require('uuid')
 
 const router = express.Router()
 // eslint-disable-next-line no-undef
@@ -13,17 +14,25 @@ router.post('/:UserId', wrapper( async (req, res) =>{
 		debug('User didn\'t exist')
 	}
 	else{
-		//Si falla crear un nuevo Json
-		const botJson = req.body
-		botJson.User = userId
+		const botJson = {
+			id: uuidv4(),
+			name:req.body.name,
+			UserId: req.userId,
+			PageId: req.body.pageId
+		}
 		const bot = await Bot.create(botJson)
-		res.send(bot)
+		res.status(200).send(bot)
 	}
-	
+
 }))
 
-router.get('/', wrapper( async (req, res) =>{
-	const bots = await Bot.findAll({ where: { UserId: req.body.UserId } })
+router.get('/:PageId', wrapper(async (req, res) => {
+	const bots = await Bot.findAll({where: {PageId: req.params.PageId}})
+	res.send(bots)
+}))
+
+router.get('/:UserId', wrapper( async (req, res) =>{
+	const bots = await Bot.findAll({ where: { UserId: req.params.UserId }})
 	res.send(bots)
 }))
 

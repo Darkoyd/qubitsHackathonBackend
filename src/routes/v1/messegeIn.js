@@ -1,5 +1,6 @@
 const debug = require('debug')('backend:routes:messegeIn')
 const express = require('express')
+const { v4: uuidv4 } = require('uuid')
 
 const router = express.Router()
 // eslint-disable-next-line no-undef
@@ -14,10 +15,13 @@ router.post('/:InflowId', wrapper( async (req, res) =>{
 	}
 	else{
 		//Si falla crear un nuevo Json
-		const messegeInJson = req.body
-		messegeInJson.Inflow = inflowId
+		const messegeInJson = {
+			id: uuidv4(),
+			content: req.body.content,
+			InflowId: inflowId
+		}
 		const messegeIn = await MessegeIn.create(messegeInJson)
-		res.send(messegeIn)
+		res.status(200).send(messegeIn)
 	}
 	
 }))
