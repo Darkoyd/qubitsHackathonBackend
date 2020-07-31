@@ -10,10 +10,12 @@ const axios = require('axios')
 
 router.get('/', wrapper( async (req, res) =>{
 	const data = {
+		// eslint-disable-next-line no-undef
 		'api_key': process.env.SCEENIC_API_KEY,
 		'method': 'token',
 		'params': {} 
 	}
+	// eslint-disable-next-line no-undef
 	const jwt_token = jwt.sign({'exp': Date.now()+30000 ,'data':data}, process.env.SCEENIC_API_SECRET, { algorithm: 'HS256'})
 	const config = {
 		headers: {
@@ -21,6 +23,7 @@ router.get('/', wrapper( async (req, res) =>{
 		}
 	}
 	debug(jwt_token)
+	// eslint-disable-next-line no-undef
 	const respuesta = await axios.get(process.env.SCEENIC_CAS_URL+'/token', config)
 	debug(respuesta)
 	res.send(respuesta.data)
