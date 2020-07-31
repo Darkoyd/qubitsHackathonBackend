@@ -25,7 +25,7 @@ router.post('/signin', wrapper(async (req, res) => {
 }))
 
 router.get('/signout', wrapper(async (req, res) => {
-	const result = await UserAuthToken.destroy({ where: { token: req.get('authorization') } })
+	const result = await UserAuthToken.destroy({ where: { token: req.get('autorization') } })
 	if (result === 0) {
 		debug('Token didn\'t exist')
 	}
