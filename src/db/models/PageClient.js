@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const errors = require('../../utils/validationErrors')
 
-class InteractionIn extends Sequelize.Model {
+class PageClient extends Sequelize.Model {
 	static init(sequelize) {
 		return super.init({
 			id: {
@@ -43,21 +43,17 @@ class InteractionIn extends Sequelize.Model {
 	}
 
 	static associate (models) {
-		this.belongsTo(models.MessegeIn,  {
+		this.hasMany(models.InteractionIn,  {
 			foreignKey: {
-				name: 'MessegeInId',
-				allowNull: false
-			},
-			as: 'MessegeIn'
+				allowNull: true
+			}
 		})
-		this.belongsTo(models.PageClient,  {
+		this.hasMany(models.InteractionOut,  {
 			foreignKey: {
-				name: 'PageClientId',
-				allowNull: false
-			},
-			as: 'PageClient'
+				allowNull: true
+			}
 		})
 	}
 }
 
-module.exports = InteractionIn
+module.exports = PageClient

@@ -50,6 +50,13 @@ class InteractionOut extends Sequelize.Model {
 			},
 			as: 'MessegeOut'
 		})
+		this.belongsTo(models.PageClient,  {
+			foreignKey: {
+				name: 'PageClientId',
+				allowNull: false
+			},
+			as: 'PageClient'
+		})
 	}
 }
 
