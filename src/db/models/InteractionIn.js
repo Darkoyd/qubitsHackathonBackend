@@ -10,8 +10,19 @@ class InteractionIn extends Sequelize.Model {
 				primaryKey: true,
 				defaultValue: Sequelize.UUID
 			},
-			facebookName: {
-				type: Sequelize.STRING,
+			psId: {
+				type: Sequelize.INTEGER,
+				allowNull: false,
+				validate: {
+					notEmpty: {
+						args: true,
+						msg: errors.empty('content')
+					}
+				}
+			},
+			finalizada: {
+				type: Sequelize.INTEGER,
+				defaultValue: false,
 				allowNull: false,
 				validate: {
 					notEmpty: {

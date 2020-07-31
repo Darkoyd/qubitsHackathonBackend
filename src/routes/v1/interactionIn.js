@@ -17,7 +17,7 @@ router.post('/:MessegeInId', wrapper( async (req, res) =>{
 		//Si falla crear un nuevo Json
 		const interactionInJson = {
 			id: uuidv4(),
-			facebookName: req.body.facebookName,
+			psId: req.body.psId,
 			data: req.body.data,
 			MessegeInId: messegeInId
 		}
