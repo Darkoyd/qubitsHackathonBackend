@@ -4,8 +4,7 @@ const cors = require('cors')
 const debug = require('debug')('backend:server')
 const express = require('express')
 const logger = require('morgan-debug')
-const path = require('path')
-const fs = require('fs')
+const routeLoader = require('express-route-autoloader')
 
 /**
  * Debug if event loop if blocked for more than 100 ms
@@ -38,22 +37,7 @@ app.use('/v1', require('./middleware/auth'))
 /**
  * Use automatic route loader
  */
-function loadRoutes(app, routerPath = 'src/routes') {
-	const routes = fs.readdirSync(routerPath)
-	routes.forEach(file => {
-		const filePath = path.join(routerPath,file)
-		const stat = fs.statSync(filePath)
-		if (stat.isDirectory()) {
-			loadRoutes(app, filePath)
-		} else {
-			const route = filePath.replace('src\\routes\\', '/').replace('\\','/').replace('.js', '').replace('index', '')
-			const requireFilePath = path.resolve(filePath)
-			app.use(route, require(requireFilePath))
-		}
-	})
-}
-
-loadRoutes(app)
+routeLoader(app)
 
 /**
  * 404 error handler

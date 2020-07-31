@@ -17,7 +17,7 @@ router.post('/:UserId', wrapper( async (req, res) =>{
 		const botJson = {
 			id: uuidv4(),
 			name:req.body.name,
-			UserId: req.userId,
+			UserId: userId,
 			PageId: req.body.pageId
 		}
 		const bot = await Bot.create(botJson)

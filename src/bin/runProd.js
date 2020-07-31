@@ -1,5 +1,5 @@
 
-const app = require('../app')
+const app = require('../appProd')
 const db = require('../db')
 const debug = require('debug')('backend:starter')
 const http = require('http')
