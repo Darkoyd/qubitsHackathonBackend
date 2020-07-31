@@ -1,7 +1,4 @@
 
-// eslint-disable-next-line no-undef
-require('dotenv').config(__dirname + '.env')
-
 const app = require('../app')
 const db = require('../db')
 const debug = require('debug')('backend:starter')
