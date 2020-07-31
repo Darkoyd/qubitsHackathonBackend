@@ -21,9 +21,9 @@ class InteractionIn extends Sequelize.Model {
 				}
 			},
 			finalizada: {
-				type: Sequelize.INTEGER,
-				defaultValue: false,
+				type: Sequelize.BOOLEAN,
 				allowNull: false,
+				defaultValue: false,
 				validate: {
 					notEmpty: {
 						args: true,
