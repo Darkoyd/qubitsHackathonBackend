@@ -13,7 +13,7 @@ router.get('/', wrapper( async (req, res) =>{
 		// eslint-disable-next-line no-undef
 		'api_key': process.env.SCEENIC_API_KEY,
 		'method': 'token',
-		'params': {} 
+		'params': {}
 	}
 	// eslint-disable-next-line no-undef
 	const jwt_token = jwt.sign({'exp': Date.now()+30000 ,'data':data}, process.env.SCEENIC_API_SECRET, { algorithm: 'HS256'})
