@@ -17,7 +17,6 @@ router.post('/:BotId', wrapper( async (req, res) =>{
 		//Si falla crear un nuevo Json
 		const inflowJson = {
 			id: uuidv4(),
-			message: req.body.message,
 			BotId: botId
 		}
 		const inflow = await Inflow.create(inflowJson)
@@ -57,8 +56,8 @@ router.put('/:InflowId/Previous/:PreviousId',  wrapper( async (req, res) =>{
 		res.sendStatus(404)
 	}
 	else {
-		const botId = inflow.Bot
-		const previous = await Outflow.findOne({ where: { id: req.params.PreviousId,  Bot: botId}})
+		const botId = inflow.BotId
+		const previous = await Outflow.findOne({ where: { id: req.params.PreviousId,  BotId: botId}})
 		if (previous === 0) {
 			res.sendStatus(401)
 		}
