@@ -7,6 +7,7 @@ const wrapper = require('express-debug-async-wrap')(debug)
 
 const axios = require('axios')
 
+// eslint-disable-next-line no-undef
 const { Page, Bot, Inflow, Outflow, MessegeIn, MessegeOut, InteractionIn, InteractionOut} = require(`${process.cwd()}/src/db`)
 
 router.post('/webhook', wrapper(async (req, res) => {
@@ -27,7 +28,7 @@ router.post('/webhook', wrapper(async (req, res) => {
 			// Check if the event is a message or postback and
 			// pass the event to the appropriate handler function
 			if (webhook_event.message) {
-				handleMessage(sender_psid, webhook_event.message)        
+				handleMessage(sender_psid, webhook_event.message)
 			} else if (webhook_event.postback) {
 				handlePostback(sender_psid, webhook_event.postback)
 			}
@@ -62,46 +63,47 @@ router.get('/webhook', wrapper(async (req, res) => {
 }))
 
 // Handles messages events
-function handleMessage(sender_psid, received_message) {
+async function handleMessage(sender_psid, inflowId) {
 	let response
-
 	// Check if the message contains text
-	if (received_message.text) {    
+	if (inflowId) {
+		//TODO Conseguir el siguiente en el flujo
+		outflowId = await nextInFlow(sender_psid, inflowId)
+		const messageOut = await MessegeOut.findOne({where: {OutflowId: outflowId}})
+		response = messageOut.message
+	} else {
+		throw new Error('Flow error')
+	}
+	// if (received_message.attachments) {
+	// Get the URL of the message attachment
+	// 	let attachment_url = received_message.attachments[0].payload.url
+	// 	response = {
+	// 	  'attachment': {
+	// 			'type': 'template',
+	// 			'payload': {
+	// 		  'template_type': 'generic',
+	// 		  'elements': [{
+	// 					'title': 'Is this the right picture?',
+	// 					'subtitle': 'Tap a button to answer.',
+	// 					'image_url': attachment_url,
+	// 					'buttons': [
+	// 			  {
+	// 							'type': 'postback',
+	// 							'title': 'Yes!',
+	// 							'payload': 'yes',
+	// 			  },
+	// 			  {
+	// 							'type': 'postback',
+	// 							'title': 'No!',
+	// 							'payload': 'no',
+	// 			  }
+	// 					],
+	// 		  }]
+	// 			}
+	// 	  }
+	// 	}
+	//   }
 
-		// Create the payload for a basic text message
-		response = {
-			'text': `You sent the message: "${received_message.text}". Now send me an image!`
-		}
-	}  else if (received_message.attachments) {
-		// Get the URL of the message attachment
-		let attachment_url = received_message.attachments[0].payload.url;
-		response = {
-		  'attachment': {
-				'type': 'template',
-				'payload': {
-			  'template_type': 'generic',
-			  'elements': [{
-						'title': 'Is this the right picture?',
-						'subtitle': 'Tap a button to answer.',
-						'image_url': attachment_url,
-						'buttons': [
-				  {
-								'type': 'postback',
-								'title': 'Yes!',
-								'payload': 'yes',
-				  },
-				  {
-								'type': 'postback',
-								'title': 'No!',
-								'payload': 'no',
-				  }
-						],
-			  }]
-				}
-		  }
-		}
-	  } 
-  
 	// Sends the response message
 	callSendAPI(sender_psid, response)
 
@@ -110,17 +112,38 @@ function handleMessage(sender_psid, received_message) {
 // Handles messaging_postbacks events
 function handlePostback(sender_psid, received_postback) {
 	let response
-  
 	// Get the payload for the postback
-	let payload = received_postback.payload
+	let inflowId = received_postback.payload
 
-	// Set the response based on the postback payload
-	if (payload === 'yes') {
-		response = { 'text': 'Thanks!' }
-	} else if (payload === 'no') {
-		response = { 'text': 'Oops, try sending another image.' }
+	if (inflowId) {
+		//TODO Conseguir el siguiente en el flujo
+		outflowId = await nextInFlow(sender_psid, inflowId)
+		const messageOut = await MessegeOut.findOne({where: {OutflowId: outflowId}})
+
+		const messageIns //TODO algun metodo que retorne todos los inflows (OBJETOS NO IDS) del outflow ESTO ES AWAIT
+		const buttons = messageIns.forEach((el) => {
+			//SI ESTE FOR EACH FALLA, HACER FOREACH A LA ANTIGUA
+			buttons.push({
+				type: 'postback',
+				title: el.message.text,
+				payload: el.id
+			})
+		})
+		response = {
+			message: {
+				attachment: {
+					type: 'template',
+					payload: {
+						template_type: 'button',
+						text: messageOut.message.text,
+						buttons: buttons
+					}
+				}
+			}
+		}
+	} else {
+		throw new Error('Flow error')
 	}
-	// Send the message to acknowledge the postback
 	callSendAPI(sender_psid, response)
 
 }
@@ -135,6 +158,7 @@ function callSendAPI(sender_psid, response) {
 		'message': response
 	  }
 
+	// eslint-disable-next-line no-undef
 	axios.post(`https://graph.facebook.com/v2.6/me/messages?access_token=${process.env.ACCESS_TOKEN}`, request_body).then(function (response) {
 		console.log('message sent!')
 	  })
