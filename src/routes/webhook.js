@@ -235,4 +235,18 @@ async function callSendAPI(sender_psid, response, page_id) {
 	  })
 }
 
+async function sceenicMessage(inflowID, sender_psid){
+
+	const midflow = await PreviousInflow.findOne({where: {InflowId: inflowID}})
+	const outflow = await Outflow.findOne({where: {id: midflow.OutflowId}})
+	const message = await MessegeOut.findOne({where:{OutflowId: outflow.id}})
+	let urlId = message.content.text
+	let url = urlId.replace('{{ID}}',uuidv4())
+
+	let request = {
+		'text':'sigue el siguiente url para conectarte a la llamada ' + url
+	}
+	callSendAPI(sender_psid,request)
+}
+
 module.exports = router
