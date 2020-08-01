@@ -1,32 +1,41 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 const debug = require('debug')('backend:routes:webhook')
 const express = require('express')
+const { v4: uuidv4 } = require('uuid')
 
 const router = express.Router()
 const wrapper = require('express-debug-async-wrap')(debug)
 
 const axios = require('axios')
 
-// eslint-disable-next-line no-undef
-const { Page, Bot, Inflow, Outflow, MessegeIn, MessegeOut, InteractionIn, InteractionOut} = require(`${process.cwd()}/src/db`)
+const { Page, Bot, Inflow, Outflow, MessegeIn, MessegeOut, InteractionIn, InteractionOut, PageClient} = require(`${process.cwd()}/src/db`)
+
 
 router.post('/webhook', wrapper(async (req, res) => {
 	let body = req.body
-	// Checks this is an event from a page subscription
+	
 	if (body.object === 'page') {
-		// Iterates over each entry - there may be multiple if batched
+		
 		body.entry.forEach(function(entry) {
-			// Gets the message. entry.messaging is an array, but
-			// will only ever contain one message, so we get index 0
+
+			let page_id = entry.id
+			
 			let webhook_event = entry.messaging[0]
 			console.log(webhook_event)
 
-			// Get the sender PSID
+
 			let sender_psid = webhook_event.sender.id
 			console.log('Sender PSID: ' + sender_psid)
 
-			// Check if the event is a message or postback and
-			// pass the event to the appropriate handler function
+			const client = PageClient.findOne({ where: { psId: sender_psid, PageId: page_id } })
+			if(client === 0)
+			{
+				const info = await this.getUserData(sender_psid)
+				client = await PageClient.create({id: uuidv4(), psId: sender_psid, data: info, PageId: page_id})
+
+			}
+
+			
 			if (webhook_event.message) {
 				handleMessage(sender_psid, webhook_event.message)
 			} else if (webhook_event.postback) {

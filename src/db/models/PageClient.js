@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const errors = require('../../utils/validationErrors')
 
-class InteractionOut extends Sequelize.Model {
+class PageClient extends Sequelize.Model {
 	static init(sequelize) {
 		return super.init({
 			id: {
@@ -10,16 +10,19 @@ class InteractionOut extends Sequelize.Model {
 				primaryKey: true,
 				defaultValue: Sequelize.UUID
 			},
-			finalizada: {
-				type: Sequelize.BOOLEAN,
+			psId: {
+				type: Sequelize.STRING,
 				allowNull: false,
-				defaultValue: false,
 				validate: {
 					notEmpty: {
 						args: true,
 						msg: errors.empty('content')
 					}
 				}
+			},
+			data: {
+				type: Sequelize.JSONB,
+				allowNull: true,
 			}
 		}, {
 			sequelize,
@@ -29,21 +32,24 @@ class InteractionOut extends Sequelize.Model {
 	}
 
 	static associate (models) {
-		this.belongsTo(models.MessegeOut,  {
+		this.hasMany(models.InteractionIn,  {
 			foreignKey: {
-				name: 'MessegeOutId',
-				allowNull: false
-			},
-			as: 'MessegeOut'
+				allowNull: true
+			}
 		})
-		this.belongsTo(models.PageClient,  {
+		this.hasMany(models.InteractionOut,  {
 			foreignKey: {
-				name: 'PageClientId',
+				allowNull: true
+			}
+		})
+		this.belongsTo(models.Page,  {
+			foreignKey: {
+				name: 'PageId',
 				allowNull: false
 			},
-			as: 'PageClient'
+			as: 'Page'
 		})
 	}
 }
 
-module.exports = InteractionOut
+module.exports = PageClient

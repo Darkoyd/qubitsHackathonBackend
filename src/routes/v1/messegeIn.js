@@ -17,7 +17,9 @@ router.post('/:InflowId', wrapper( async (req, res) =>{
 		//Si falla crear un nuevo Json
 		const messegeInJson = {
 			id: uuidv4(),
-			content: req.body.content,
+			content: { message: req.body.content.message,
+				inflowId: inflow.id
+			},
 			InflowId: inflowId
 		}
 		const messegeIn = await MessegeIn.create(messegeInJson)
