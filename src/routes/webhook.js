@@ -34,7 +34,7 @@ router.post('/webhook', wrapper(async (req, res) => {
 			if(client === 0)
 			{
 				//const info = await getUserData(sender_psid)
-				client = await PageClient.create({id: uuidv4(), psId: sender_psid, data: info, PageId: page_id})
+				client = await PageClient.create({id: uuidv4(), psId: sender_psid, PageId: page_id})
 
 			}
 			
@@ -135,8 +135,7 @@ async function handlePostback(sender_psid, received_postback, page_id) {
 	if (inflowId) {
 		const mesInflow = await MessegeIn.findOne({where: {InflowId: inflowId}})
 		if(mesInflow.content.url){
-			await sceenicMessage(inflowId, sender_psid)
-			await sendEmailSceenicURL(mesInflow.content.url, page_id)
+			await sceenicMessage(inflowId, sender_psid, page_id)
 		}
 		else{
 			//TODO Conseguir el siguiente en el flujo
@@ -218,10 +217,10 @@ async function getUserData(sender_psid, page_id){
 				reject(Error('Network Error'))
 		  })
 		  .on('end', () => {
-				body = Buffer.concat(body).toString()
+				//body = Buffer.concat(body).toString()
 				// console.log(JSON.parse(body));
   
-				resolve(JSON.parse(body))
+				//resolve(JSON.parse(body))
 		  })
 	  })
 }
@@ -246,23 +245,25 @@ async function callSendAPI(sender_psid, response, page_id) {
 	  })
 }
 
-async function sceenicMessage(inflowID, sender_psid){
+async function sceenicMessage(inflowID, sender_psid, page_id){
 
 	const midflow = await PreviousInflow.findOne({where: {InflowId: inflowID}})
 	const outflow = await Outflow.findOne({where: {id: midflow.OutflowId}})
 	const message = await MessegeOut.findOne({where:{OutflowId: outflow.id}})
 	let urlId = message.content.text
-	let url = urlId.replace('{{ID}}',uuidv4())
+	let sessionId = uuidv4()
+	let url = urlId.replace('{{ID}}', sessionId)
 
 	let request = {
-		'text':'sigue el siguiente url para conectarte a la llamada ' + url
+		'text':'sigue el siguiente url para conectarte a la llamada ' + url + ' El id de la session es '+ sessionId
 	}
+	await sendEmailSceenicURL(url, page_id, sessionId)
 	callSendAPI(sender_psid,request)
 }
 
 
 //send email with sceenic url 
-async function sendEmailSceenicURL(urlSceenic, page_id){
+async function sendEmailSceenicURL(urlSceenic, page_id, sessionId){
 	const page = await Page.findOne({where: {id: page_id}})
 	const user = await User.findOne({where: {id: page.UserId}})
 	let transporter = nodemailer.createTransport({
@@ -277,7 +278,7 @@ async function sendEmailSceenicURL(urlSceenic, page_id){
 		from: 'qubitapptestmail@gmail.com',
 		to: user.email ,
 		subject: 'Reunion solicitad mediante un bot',
-		text: 'El url de la reunion es : ' + urlSceenic
+		text: 'El url de la reunion es : ' + urlSceenic +'. El id de la sesion es: ' + sessionId
 	}
 	
 	transporter.sendMail(mailOptions, function(err, data){
