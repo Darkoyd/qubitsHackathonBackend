@@ -5,6 +5,7 @@ const debug = require('debug')('backend:server')
 const express = require('express')
 const logger = require('morgan-debug')
 const routeLoader = require('express-route-autoloader')
+const cron = require('./cron')
 
 /**
  * Debug if event loop if blocked for more than 100 ms
@@ -38,6 +39,11 @@ app.use('/v1', require('./middleware/auth'))
  * Use automatic route loader
  */
 routeLoader(app)
+
+/**
+ * Calls cron job
+ */
+cron()
 
 /**
  * 404 error handler
