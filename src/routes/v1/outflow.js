@@ -15,8 +15,14 @@ router.post('/:BotId', wrapper( async (req, res) =>{
 	}
 	else{
 		//Si falla crear un nuevo Json
+		let firstValue = false
+		if(req.body)
+		{
+			firstValue = true
+		}
 		const outflowJson = {
 			id: uuidv4(),
+			first: firstValue,
 			BotId: botId
 		}
 		const outflow = await Outflow.create(outflowJson)

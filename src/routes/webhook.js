@@ -10,7 +10,7 @@ const axios = require('axios')
 const request = require('request')
 
 // eslint-disable-next-line no-unused-vars
-const { Page, Bot, Inflow, Outflow, MessegeIn, MessegeOut, InteractionIn, InteractionOut, PageClient, PreviousInflow, PreviousOutflow} = require(`${process.cwd()}/src/db`)
+const { User, Page, Bot, Inflow, Outflow, MessegeIn, MessegeOut, InteractionIn, InteractionOut, PageClient, PreviousInflow, PreviousOutflow} = require(`${process.cwd()}/src/db`)
 
 
 router.post('/webhook', wrapper(async (req, res) => {
@@ -33,11 +33,10 @@ router.post('/webhook', wrapper(async (req, res) => {
 			let client = await PageClient.findOne({ where: { psId: sender_psid, PageId: page_id } })
 			if(client === 0)
 			{
-				const info = await getUserData(sender_psid)
+				//const info = await getUserData(sender_psid)
 				client = await PageClient.create({id: uuidv4(), psId: sender_psid, data: info, PageId: page_id})
 
 			}
-
 			
 			if (webhook_event.message) {
 				handleMessage(sender_psid, webhook_event.message, page_id)
@@ -75,13 +74,18 @@ router.get('/webhook', wrapper(async (req, res) => {
 	}
 }))
 
+//async function newInteraction(messegeInId, messegeOutId, sender_psid, page_id){
+
+//}
+
 // Handles messages events
 async function handleMessage(sender_psid, inflowId, page_id) {
 	let response
 	// Check if the message contains text
 	if (inflowId) {
 		//TODO Conseguir el siguiente en el flujo
-		const outflowId = await nextInFlow(sender_psid, inflowId)
+		const bot = await Bot.findOne({where: {PageId: page_id}})
+		const outflowId = await Outflow.findOne({where: {BotId: bot.id, first: true}})
 		const messageOut = await MessegeOut.findOne({where: {OutflowId: outflowId}})
 		response = messageOut.message
 	} else {
@@ -129,27 +133,34 @@ async function handlePostback(sender_psid, received_postback, page_id) {
 	let inflowId = received_postback.payload
 
 	if (inflowId) {
-		//TODO Conseguir el siguiente en el flujo
-		const outflowId = await nextInFlow(sender_psid, inflowId)
-		const messageOut = await MessegeOut.findOne({where: {OutflowId: outflowId}})
+		const mesInflow = await MessegeIn.findOne({where: {InflowId: inflowId}})
+		if(mesInflow.content.url){
+			await sceenicMessage(inflowId, sender_psid)
+			await sendEmailSceenicURL(mesInflow.content.url, page_id)
+		}
+		else{
+			//TODO Conseguir el siguiente en el flujo
+			const outflowId = await nextInFlow(sender_psid, inflowId)
+			const messageOut = await MessegeOut.findOne({where: {OutflowId: outflowId}})
 
-		const messageIns = await followingOptions(sender_psid, outflowId) //TODO algun metodo que retorne todos los inflows (OBJETOS NO IDS) del outflow ESTO ES AWAIT
-		const buttons = messageIns.forEach((el) => {
+			const messageIns = await followingOptions(sender_psid, outflowId) //TODO algun metodo que retorne todos los inflows (OBJETOS NO IDS) del outflow ESTO ES AWAIT
+			const buttons = messageIns.forEach((el) => {
 			//SI ESTE FOR EACH FALLA, HACER FOREACH A LA ANTIGUA
-			buttons.push({
-				type: 'postback',
-				title: el.message.text,
-				payload: el.id
+				buttons.push({
+					type: 'postback',
+					title: el.message.text,
+					payload: el.id
+				})
 			})
-		})
-		response = {
-			message: {
-				attachment: {
-					type: 'template',
-					payload: {
-						template_type: 'button',
-						text: messageOut.message.text,
-						buttons: buttons
+			response = {
+				message: {
+					attachment: {
+						type: 'template',
+						payload: {
+							template_type: 'button',
+							text: messageOut.message.text,
+							buttons: buttons
+						}
 					}
 				}
 			}
@@ -247,10 +258,13 @@ async function sceenicMessage(inflowID, sender_psid){
 		'text':'sigue el siguiente url para conectarte a la llamada ' + url
 	}
 	callSendAPI(sender_psid,request)
+}
 
 
-	//send email with sceenic url 
-async function sendEmailSceenicURL(userEmail, urlSceenic){
+//send email with sceenic url 
+async function sendEmailSceenicURL(urlSceenic, page_id){
+	const page = await Page.findOne({where: {id: page_id}})
+	const user = await User.findOne({where: {id: page.UserId}})
 	let transporter = nodemailer.createTransport({
 		service: 'gmail',
 		auth:   {
@@ -261,31 +275,19 @@ async function sendEmailSceenicURL(userEmail, urlSceenic){
 	
 	let mailOptions = {
 		from: 'qubitapptestmail@gmail.com',
-		to: userEmail ,
-		subject: 'testing',
-		text: 'El url es : ' + urlSceenic
+		to: user.email ,
+		subject: 'Reunion solicitad mediante un bot',
+		text: 'El url de la reunion es : ' + urlSceenic
 	}
 	
 	transporter.sendMail(mailOptions, function(err, data){
 		if (err) {
 			console.log('ocurrio un error', err)
 		} else {
-			console.log('email enviado')
+			console.log('email enviado '+ data)
 		}
-	});
+	})
 }
 
-
-
-
-
-
-
-
-
-
-
-
-}
 
 module.exports = router

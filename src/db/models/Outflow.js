@@ -10,6 +10,10 @@ class Outflow extends Sequelize.Model {
 				allowNull: false,
 				primaryKey: true,
 				defaultValue: Sequelize.UUID
+			},
+			first: {
+				type: Sequelize.BOOLEAN,
+				allowNull: false,
 			}
 		}, {
 			sequelize,
