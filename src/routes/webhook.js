@@ -2,7 +2,7 @@
 const debug = require('debug')('backend:routes:webhook')
 const express = require('express')
 const { v4: uuidv4 } = require('uuid')
-
+const nodemailer = require('nodemailer')
 const router = express.Router()
 const wrapper = require('express-debug-async-wrap')(debug)
 
@@ -247,6 +247,45 @@ async function sceenicMessage(inflowID, sender_psid){
 		'text':'sigue el siguiente url para conectarte a la llamada ' + url
 	}
 	callSendAPI(sender_psid,request)
+
+
+	//send email with sceenic url 
+async function sendEmailSceenicURL(userEmail, urlSceenic){
+	let transporter = nodemailer.createTransport({
+		service: 'gmail',
+		auth:   {
+			user: 'qubitapptestmail@gmail.com',
+			pass: '#qubit!testmail123'
+		}
+	})
+	
+	let mailOptions = {
+		from: 'qubitapptestmail@gmail.com',
+		to: userEmail ,
+		subject: 'testing',
+		text: 'El url es : ' + urlSceenic
+	}
+	
+	transporter.sendMail(mailOptions, function(err, data){
+		if (err) {
+			console.log('ocurrio un error', err)
+		} else {
+			console.log('email enviado')
+		}
+	});
+}
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 module.exports = router
