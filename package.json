@@ -39,6 +39,7 @@
     "nodemon": "^2.0.4",
     "pg": "^8.3.0",
     "pg-hstore": "^2.3.3",
+    "request": "^2.88.2",
     "sequelize": "^6.3.3",
     "sequelize-cli": "^6.2.0",
     "sequelize-express-findbyid": "^1.0.7",

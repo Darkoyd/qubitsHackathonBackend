@@ -7,6 +7,7 @@ const router = express.Router()
 const wrapper = require('express-debug-async-wrap')(debug)
 
 const axios = require('axios')
+const request = require("request")
 
 const { Page, Bot, Inflow, Outflow, MessegeIn, MessegeOut, InteractionIn, InteractionOut, PageClient} = require(`${process.cwd()}/src/db`)
 
@@ -27,20 +28,20 @@ router.post('/webhook', wrapper(async (req, res) => {
 			let sender_psid = webhook_event.sender.id
 			console.log('Sender PSID: ' + sender_psid)
 
-			const client = PageClient.findOne({ where: { psId: sender_psid, PageId: page_id } })
+			const client = await PageClient.findOne({ where: { psId: sender_psid, PageId: page_id } })
 			if(client === 0)
 			{
-				const info = await this.getUserData(sender_psid)
+				const info = await getUserData(sender_psid)
 				client = await PageClient.create({id: uuidv4(), psId: sender_psid, data: info, PageId: page_id})
 
 			}
 
 			
 			if (webhook_event.message) {
-				handleMessage(sender_psid, webhook_event.message)
+				handleMessage(sender_psid, webhook_event.message, page_id)
 			} else if (webhook_event.postback) {
-				handlePostback(sender_psid, webhook_event.postback)
-			}
+				handlePostback(sender_psid, webhook_event.postback, page_id)
+			} 
 		})
 		// Returns a '200 OK' response to all requests
 		res.status(200).send('EVENT_RECEIVED')
@@ -52,7 +53,7 @@ router.post('/webhook', wrapper(async (req, res) => {
 
 router.get('/webhook', wrapper(async (req, res) => {
 	// Your verify token. Should be a random string.
-	let VERIFY_TOKEN = 'abc'
+	let VERIFY_TOKEN = process.env.VERIFY_TOKEN
 	// Parse the query params
 	let mode = req.query['hub.mode']
 	let token = req.query['hub.verify_token']
@@ -72,7 +73,7 @@ router.get('/webhook', wrapper(async (req, res) => {
 }))
 
 // Handles messages events
-async function handleMessage(sender_psid, inflowId) {
+async function handleMessage(sender_psid, inflowId, page_id) {
 	let response
 	// Check if the message contains text
 	if (inflowId) {
@@ -114,12 +115,12 @@ async function handleMessage(sender_psid, inflowId) {
 	//   }
 
 	// Sends the response message
-	callSendAPI(sender_psid, response)
+	callSendAPI(sender_psid, response, page_id)
 
 }
 
 // Handles messaging_postbacks events
-function handlePostback(sender_psid, received_postback) {
+function handlePostback(sender_psid, received_postback, page_id) {
 	let response
 	// Get the payload for the postback
 	let inflowId = received_postback.payload
@@ -153,13 +154,56 @@ function handlePostback(sender_psid, received_postback) {
 	} else {
 		throw new Error('Flow error')
 	}
-	callSendAPI(sender_psid, response)
+	callSendAPI(sender_psid, response, page_id)
 
 }
 
+function nextInFlow(sender_psid, inflowId){
+	const temp = await PreviousInflows.findOne({where: {InflowId: inflowId}})
+	return temp.OutflowId
+}
+
+async function getUserData(sender_psid, page_id){
+	return new Promise(function(resolve, reject) {
+		let body = [];
+  
+		// Send the HTTP request to the Graph API
+		request({
+		  uri: `${config.mPlatfom}/${senderPsid}`,
+		  qs: {
+			access_token: config.pageAccesToken,
+			fields: "first_name, last_name, gender, locale, timezone"
+		  },
+		  method: "GET"
+		})
+		  .on("response", function(response) {
+			// console.log(response.statusCode);
+  
+			if (response.statusCode !== 200) {
+			  reject(Error(response.statusCode));
+			}
+		  })
+		  .on("data", function(chunk) {
+			body.push(chunk);
+		  })
+		  .on("error", function(error) {
+			console.error("Unable to fetch profile:" + error);
+			reject(Error("Network Error"));
+		  })
+		  .on("end", () => {
+			body = Buffer.concat(body).toString();
+			// console.log(JSON.parse(body));
+  
+			resolve(JSON.parse(body));
+		  });
+	  });
+}
+
 // Sends response messages via the Send API
-function callSendAPI(sender_psid, response) {
+function callSendAPI(sender_psid, response, page_id) {
 	// Construct the message body
+	const page = await Page.findOne({where: {id: page_id}})
+	const user = await user.findOne({where: {id: page.UserId}})
 	let request_body = {
 		'recipient': {
 		  'id': sender_psid
@@ -168,7 +212,7 @@ function callSendAPI(sender_psid, response) {
 	  }
 
 	// eslint-disable-next-line no-undef
-	axios.post(`https://graph.facebook.com/v2.6/me/messages?access_token=${process.env.ACCESS_TOKEN}`, request_body).then(function (response) {
+	axios.post(`${process.env.MESSENGER_PLATFORM}/me/messages?access_token=${process.env.ACCESS_TOKEN}`, request_body).then(function (response) {
 		console.log('message sent!')
 	  })
 	  .catch(function (error) {
