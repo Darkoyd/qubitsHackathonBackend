@@ -92,6 +92,11 @@ class Page extends Sequelize.Model {
 				allowNull: true
 			}
 		})
+		this.hasMany(models.PageClient, {
+			foreignKey: {
+				allowNull: true
+			}
+		})
 	}
 }
 

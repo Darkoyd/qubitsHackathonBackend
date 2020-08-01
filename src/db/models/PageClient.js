@@ -11,19 +11,8 @@ class PageClient extends Sequelize.Model {
 				defaultValue: Sequelize.UUID
 			},
 			psId: {
-				type: Sequelize.INTEGER,
+				type: Sequelize.STRING,
 				allowNull: false,
-				validate: {
-					notEmpty: {
-						args: true,
-						msg: errors.empty('content')
-					}
-				}
-			},
-			finalizada: {
-				type: Sequelize.BOOLEAN,
-				allowNull: false,
-				defaultValue: false,
 				validate: {
 					notEmpty: {
 						args: true,
@@ -52,6 +41,13 @@ class PageClient extends Sequelize.Model {
 			foreignKey: {
 				allowNull: true
 			}
+		})
+		this.belongsTo(models.Page,  {
+			foreignKey: {
+				name: 'PageId',
+				allowNull: false
+			},
+			as: 'Page'
 		})
 	}
 }

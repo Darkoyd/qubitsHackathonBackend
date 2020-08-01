@@ -17,7 +17,9 @@ router.post('/:OutflowId', wrapper( async (req, res) =>{
 		//Si falla crear un nuevo Json
 		const messegeOutJson = {
 			id: uuidv4(),
-			content: req.body.content,
+			content: { message: req.body.content.message,
+				outflowId: outflow.id
+			},
 			OutflowId: outflowId
 		}
 		const messegeOut = await MessegeOut.create(messegeOutJson)
