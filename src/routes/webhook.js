@@ -7,17 +7,19 @@ const router = express.Router()
 const wrapper = require('express-debug-async-wrap')(debug)
 
 const axios = require('axios')
-const request = require("request")
+const request = require('request')
 
-const { Page, Bot, Inflow, Outflow, MessegeIn, MessegeOut, InteractionIn, InteractionOut, PageClient} = require(`${process.cwd()}/src/db`)
+// eslint-disable-next-line no-unused-vars
+const { Page, Bot, Inflow, Outflow, MessegeIn, MessegeOut, InteractionIn, InteractionOut, PageClient, PreviousInflow, PreviousOutflow} = require(`${process.cwd()}/src/db`)
 
 
 router.post('/webhook', wrapper(async (req, res) => {
 	let body = req.body
+	const entrys = body.entry
 	
 	if (body.object === 'page') {
-		
-		body.entry.forEach(function(entry) {
+		for (let index = 0; index < entrys.length; index++) {
+			const entry = entrys[index]
 
 			let page_id = entry.id
 			
@@ -28,7 +30,7 @@ router.post('/webhook', wrapper(async (req, res) => {
 			let sender_psid = webhook_event.sender.id
 			console.log('Sender PSID: ' + sender_psid)
 
-			const client = await PageClient.findOne({ where: { psId: sender_psid, PageId: page_id } })
+			let client = await PageClient.findOne({ where: { psId: sender_psid, PageId: page_id } })
 			if(client === 0)
 			{
 				const info = await getUserData(sender_psid)
@@ -42,7 +44,7 @@ router.post('/webhook', wrapper(async (req, res) => {
 			} else if (webhook_event.postback) {
 				handlePostback(sender_psid, webhook_event.postback, page_id)
 			} 
-		})
+		}
 		// Returns a '200 OK' response to all requests
 		res.status(200).send('EVENT_RECEIVED')
 	} else {
@@ -53,6 +55,7 @@ router.post('/webhook', wrapper(async (req, res) => {
 
 router.get('/webhook', wrapper(async (req, res) => {
 	// Your verify token. Should be a random string.
+	// eslint-disable-next-line no-undef
 	let VERIFY_TOKEN = process.env.VERIFY_TOKEN
 	// Parse the query params
 	let mode = req.query['hub.mode']
@@ -78,7 +81,7 @@ async function handleMessage(sender_psid, inflowId, page_id) {
 	// Check if the message contains text
 	if (inflowId) {
 		//TODO Conseguir el siguiente en el flujo
-		outflowId = await nextInFlow(sender_psid, inflowId)
+		const outflowId = await nextInFlow(sender_psid, inflowId)
 		const messageOut = await MessegeOut.findOne({where: {OutflowId: outflowId}})
 		response = messageOut.message
 	} else {
@@ -120,17 +123,17 @@ async function handleMessage(sender_psid, inflowId, page_id) {
 }
 
 // Handles messaging_postbacks events
-function handlePostback(sender_psid, received_postback, page_id) {
+async function handlePostback(sender_psid, received_postback, page_id) {
 	let response
 	// Get the payload for the postback
 	let inflowId = received_postback.payload
 
 	if (inflowId) {
 		//TODO Conseguir el siguiente en el flujo
-		outflowId = await nextInFlow(sender_psid, inflowId)
+		const outflowId = await nextInFlow(sender_psid, inflowId)
 		const messageOut = await MessegeOut.findOne({where: {OutflowId: outflowId}})
 
-		const messageIns //TODO algun metodo que retorne todos los inflows (OBJETOS NO IDS) del outflow ESTO ES AWAIT
+		const messageIns = await followingOptions(sender_psid, outflowId) //TODO algun metodo que retorne todos los inflows (OBJETOS NO IDS) del outflow ESTO ES AWAIT
 		const buttons = messageIns.forEach((el) => {
 			//SI ESTE FOR EACH FALLA, HACER FOREACH A LA ANTIGUA
 			buttons.push({
@@ -158,52 +161,64 @@ function handlePostback(sender_psid, received_postback, page_id) {
 
 }
 
-function nextInFlow(sender_psid, inflowId){
-	const temp = await PreviousInflows.findOne({where: {InflowId: inflowId}})
+async function nextInFlow(sender_psid, inflowId){
+	const temp = await PreviousInflow.findOne({where: {InflowId: inflowId}})
 	return temp.OutflowId
 }
 
+async function followingOptions(sender_psid, outflowId){
+	const intermediarios = await PreviousOutflow.findAll({where: {InflowId: outflowId}})
+	let options = []
+	for (let index = 0; index < intermediarios.length; index++) {
+		const midle = intermediarios[index]
+		const inflow = await Inflow.findOne({where: {id: midle.OutflowId}})
+		options.push(inflow)
+	}
+	return options
+}
+
 async function getUserData(sender_psid, page_id){
+	const page = await Page.findOne({where: {id: page_id}})
 	return new Promise(function(resolve, reject) {
-		let body = [];
+		let body = []
   
 		// Send the HTTP request to the Graph API
 		request({
-		  uri: `${config.mPlatfom}/${senderPsid}`,
+		  // eslint-disable-next-line no-undef
+		  uri: `${process.env.MESSENGER_PLATFORM}/${sender_psid}`,
 		  qs: {
-			access_token: config.pageAccesToken,
-			fields: "first_name, last_name, gender, locale, timezone"
+				access_token: page.pageAccessToken,
+				fields: 'first_name, last_name, gender, locale, timezone'
 		  },
-		  method: "GET"
+		  method: 'GET'
 		})
-		  .on("response", function(response) {
+		  .on('response', function(response) {
 			// console.log(response.statusCode);
   
-			if (response.statusCode !== 200) {
-			  reject(Error(response.statusCode));
-			}
+				if (response.statusCode !== 200) {
+			  reject(Error(response.statusCode))
+				}
 		  })
-		  .on("data", function(chunk) {
-			body.push(chunk);
+		  .on('data', function(chunk) {
+				body.push(chunk)
 		  })
-		  .on("error", function(error) {
-			console.error("Unable to fetch profile:" + error);
-			reject(Error("Network Error"));
+		  .on('error', function(error) {
+				console.error('Unable to fetch profile:' + error)
+				reject(Error('Network Error'))
 		  })
-		  .on("end", () => {
-			body = Buffer.concat(body).toString();
-			// console.log(JSON.parse(body));
+		  .on('end', () => {
+				body = Buffer.concat(body).toString()
+				// console.log(JSON.parse(body));
   
-			resolve(JSON.parse(body));
-		  });
-	  });
+				resolve(JSON.parse(body))
+		  })
+	  })
 }
 
 // Sends response messages via the Send API
-function callSendAPI(sender_psid, response, page_id) {
+async function callSendAPI(sender_psid, response, page_id) {
 	// Construct the message body
 	const page = await Page.findOne({where: {id: page_id}})
-	const user = await user.findOne({where: {id: page.UserId}})
 	let request_body = {
 		'recipient': {
 		  'id': sender_psid
@@ -212,7 +227,7 @@ function callSendAPI(sender_psid, response, page_id) {
 	  }
 
 	// eslint-disable-next-line no-undef
-	axios.post(`${process.env.MESSENGER_PLATFORM}/me/messages?access_token=${process.env.ACCESS_TOKEN}`, request_body).then(function (response) {
+	axios.post(`${process.env.MESSENGER_PLATFORM}/me/messages?access_token=${page.pageAccessToken}`, request_body).then(function (response) {
 		console.log('message sent!')
 	  })
 	  .catch(function (error) {
