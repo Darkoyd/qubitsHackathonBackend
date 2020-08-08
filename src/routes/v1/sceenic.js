@@ -27,8 +27,6 @@ router.get('/', wrapper( async (req, res) =>{
 	const respuesta = await axios.get(process.env.SCEENIC_CAS_URL+'/token', config)
 	debug(respuesta)
 	res.send(respuesta.data)
-    
-	
 }))
 
 module.exports = router
