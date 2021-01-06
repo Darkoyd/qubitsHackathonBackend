@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/Darkoyd/qubitsHackathonBackend#readme",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "axios-retry": "^3.1.8",
     "bcryptjs": "^2.4.3",
     "blocked-at": "^1.2.0",
