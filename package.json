@@ -32,7 +32,7 @@
     "express": "^4.17.1",
     "express-debug-async-wrap": "^2.0.1",
     "express-route-autoloader": "^1.0.3",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "morgan": "^1.10.0",
     "morgan-debug": "^2.0.0",
     "node-cron": "^2.0.3",
